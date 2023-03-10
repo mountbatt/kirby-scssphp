@@ -25,6 +25,7 @@ $CSSKirbyPath = 'assets/css/' . $template . '.css';
 if ($template == 'default' or !file_exists($SCSS)) {
 	$SCSS         = $root . '/assets/scss/default.scss';
 	$CSS          = $root . '/assets/css/default.css';
+	$MAP          = $root . '/assets/css/default.map';
 	$CSSKirbyPath = 'assets/css/default.css';
 }
 // If the CSS file doesn't exist create it so we can write to it
