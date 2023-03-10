@@ -2,13 +2,14 @@
 
 /**
  * SCSS Snippet
- * @author    Bart van de Biezen <bart@bartvandebiezen.com>
- * @link      https://github.com/bartvandebiezen/kirby-v2-scssphp
+ * @author    Tobias Battenbberg <mountbatt@gmail.com> - inspired by Bart van de Biezen
+ * @link      https://github.com/mountbatt/kirby-scssphp
  * @return    CSS and HTML
- * @version   1.0.1
+ * @version   1.0.2
  */
 
-use Leafo\ScssPhp\Compiler;
+use ScssPhp\ScssPhp\Compiler;
+use ScssPhp\ScssPhp\OutputStyle;
 
 // Using realpath seems to work best in different situations.
 $root = realpath(__DIR__ . '/../..');
@@ -17,6 +18,7 @@ $root = realpath(__DIR__ . '/../..');
 $template     = $page->template();
 $SCSS         = $root . '/assets/scss/' . $template . '.scss';
 $CSS          = $root . '/assets/css/'  . $template . '.css';
+$MAP          = $root . '/assets/css/'  . $template . '.map';
 $CSSKirbyPath = 'assets/css/' . $template . '.css';
 
 // Set default SCSS if there is no SCSS for current template. If template is default, skip check.
@@ -50,14 +52,15 @@ $SCSSFileTime = filemtime($SCSS);
 $CSSFileTime = filemtime($CSS);
 
 // Update CSS when needed.
-if (!file_exists($CSS) or $SCSSFileTime > $CSSFileTime ) {
+if (!file_exists($CSS) or $SCSSFileTime > $CSSFileTime ) { 
 
 	// Activate library.
 	require_once $root . '/site/plugins/scssphp/scss.inc.php';
 	$parser = new Compiler();
 
 	// Setting compression provided by library.
-	$parser->setFormatter('Leafo\ScssPhp\Formatter\Compressed');
+	$parser->setOutputStyle(OutputStyle::COMPRESSED);
+	
 
 	// Setting relative @import paths.
 	$importPath = $root . '/assets/scss';
@@ -66,15 +69,31 @@ if (!file_exists($CSS) or $SCSSFileTime > $CSSFileTime ) {
 	// Place SCSS file in buffer.
 	$buffer = file_get_contents($SCSS);
 
-	// Compile content in buffer.
-	$buffer = $parser->compile($buffer);
-
-	// Minify the CSS even further.
-	require_once $root . '/site/plugins/scssphp/minify.php';
-	$buffer = minifyCSS($buffer);
+	
+	// source Map
+	$parser->setSourceMap(Compiler::SOURCE_MAP_FILE);
+	$parser->setSourceMapOptions([
+			// relative or full url to the above .map file
+			'sourceMapURL' => $MAP,
+			
+			// (optional) relative or full url to the .css file
+			//'sourceMapFilename' => 'my-style.css',
+			
+			// partial path (server root) removed (normalized) to create a relative url
+			//'sourceMapBasepath' => '/var/www/vhost',
+			
+			// (optional) prepended to 'source' field entries for relocating source files
+			//'sourceRoot' => '/',
+	]);
+	
+	// Compile all
+	$result = $parser->compileString($buffer);
+	
+	
 
 	// Update CSS file.
-	file_put_contents($CSS, $buffer);
+	file_put_contents($CSS, $result->getCss());
+	file_put_contents($MAP, $result->getSourceMap());
 }
 
 ?>
