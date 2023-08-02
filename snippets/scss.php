@@ -5,7 +5,7 @@
  * @author    Tobias Battenbberg <mountbatt@gmail.com> - inspired by Bart van de Biezen
  * @link      https://github.com/mountbatt/kirby-scssphp
  * @return    CSS and HTML
- * @version   1.0.2
+ * @version   1.0.3
  */
 
 use ScssPhp\ScssPhp\Compiler;
@@ -25,13 +25,13 @@ $CSSKirbyPath = 'assets/css/' . $template . '.css';
 if ($template == 'default' or !file_exists($SCSS)) {
 	$SCSS         = $root . '/assets/scss/default.scss';
 	$CSS          = $root . '/assets/css/default.css';
-	$MAP          = $root . '/assets/css/default.map';
+	$MAP          = 'default.map';
 	$CSSKirbyPath = 'assets/css/default.css';
 }
 // If the CSS file doesn't exist create it so we can write to it
 if (!file_exists($CSS)) {
 	if (!file_exists($root . '/assets/css/')) {
-	    mkdir($root . '/assets/css/', 0755, true);
+			mkdir($root . '/assets/css/', 0755, true);
 	}
 	touch($CSS,  mktime(0, 0, 0, date("m"), date("d"),  date("Y")-10));
 }
