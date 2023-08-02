@@ -5,7 +5,7 @@
  * @author    Tobias Battenbberg <mountbatt@gmail.com> - inspired by Bart van de Biezen
  * @link      https://github.com/mountbatt/kirby-scssphp
  * @return    CSS and HTML
- * @version   1.0.3
+ * @version   1.0.4
  */
 
 use ScssPhp\ScssPhp\Compiler;
@@ -19,13 +19,15 @@ $template     = $page->template();
 $SCSS         = $root . '/assets/scss/' . $template . '.scss';
 $CSS          = $root . '/assets/css/'  . $template . '.css';
 $MAP          = $root . '/assets/css/'  . $template . '.map';
+$MAP_FILE			= 'default.map';
 $CSSKirbyPath = 'assets/css/' . $template . '.css';
 
 // Set default SCSS if there is no SCSS for current template. If template is default, skip check.
 if ($template == 'default' or !file_exists($SCSS)) {
 	$SCSS         = $root . '/assets/scss/default.scss';
 	$CSS          = $root . '/assets/css/default.css';
-	$MAP          = 'default.map';
+	$MAP          = $root . '/assets/css/default.map';
+	$MAP_FILE			= 'default.map';
 	$CSSKirbyPath = 'assets/css/default.css';
 }
 // If the CSS file doesn't exist create it so we can write to it
@@ -75,7 +77,7 @@ if (!file_exists($CSS) or $SCSSFileTime > $CSSFileTime ) {
 	$parser->setSourceMap(Compiler::SOURCE_MAP_FILE);
 	$parser->setSourceMapOptions([
 			// relative or full url to the above .map file
-			'sourceMapURL' => $MAP,
+			'sourceMapURL' => $MAP_FILE,
 			
 			// (optional) relative or full url to the .css file
 			//'sourceMapFilename' => 'my-style.css',
